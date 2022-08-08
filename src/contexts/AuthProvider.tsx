@@ -23,13 +23,6 @@ export const useAuthContext = () => {
 
 const authService = AuthService.getInstance();
 
-const isThereLocalToken = () => {
-  if (authService.getLocalToken()) {
-    return true;
-  }
-  return false;
-};
-
 /**
  *
  * @description ContextProvider
@@ -74,7 +67,7 @@ export const AuthProvider: FC<{children: ReactNode}> = ({ children }) => {
   };
 
   const onStartUp = () => {
-    if (isThereLocalToken()) {
+    if (authService.getLocalToken()) {
       authService.fetchUserProfile()
         .then((user) => {
           setUserProfile(user);
