@@ -67,7 +67,7 @@ export const AuthProvider: FC<{children: ReactNode}> = ({ children }) => {
   };
 
   const onStartUp = () => {
-    if (authService.getLocalToken()) {
+    if (authService.getLocalToken() && !isLogged && !userProfile.id) {
       authService.fetchUserProfile()
         .then((user) => {
           setUserProfile(user);
@@ -75,6 +75,7 @@ export const AuthProvider: FC<{children: ReactNode}> = ({ children }) => {
           navigate('/');
         })
         .catch(() => {
+          // if there is no valid token we delete it
           authService.deleteLocalToken();
         });
     }
@@ -89,6 +90,7 @@ export const AuthProvider: FC<{children: ReactNode}> = ({ children }) => {
   // 1.Checks for a valid local token
   useEffect(onStartUp, []);
 
+  // Runs soon after the login and there is no userProfile
   useEffect(fetchNewUserProfile, [isLogged]);
 
   /**
