@@ -1,0 +1,40 @@
+.welcome {
+  width: 34rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.welcome__heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.4rem;
+  font-size: 2.8rem;
+}
+
+.welcome__user {
+  color: var(--primary);
+  font-size: 3.6rem;
+}
+
+.btn {
+  cursor: pointer;
+  background-color: var(--primary);
+  padding: 1.4rem 0rem;
+  border-radius: 20rem;
+  font-size: 1.6rem;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--base-content);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn:hover {
+  transform: scale(1.075) translateY(-2px);
+  background-color: var(--primary-focus);
+}
+.btn:active {
+  transform: scale(1) translateY(1px);
+}
