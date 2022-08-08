@@ -2,6 +2,7 @@ import { AxiosError } from 'axios';
 import {
   createContext, FC, ReactNode, useContext, useEffect, useMemo, useState,
 } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import type { UserPayload, UserProfile } from '../interfaces';
 import { AuthService } from '../services/AuthService.class';
@@ -22,35 +23,22 @@ export const useAuthContext = () => {
 
 const authService = AuthService.getInstance();
 
-/**
- *
- * @description this logic could go in the AuthService class
- */
-const validateToken = async (): Promise<[boolean, UserProfile]> => {
+const isThereLocalToken = () => {
   if (authService.getLocalToken()) {
-    try {
-      const userProfile = await authService.fetchUserProfile();
-      return [true, userProfile]; // is valid
-      //
-    } catch (error: any) {
-      console.log(error.message);
-      authService.deleteLocalToken(); // is invalid
-    }
+    return true;
   }
-  return [false, {} as UserProfile];
+  return false;
 };
-
-const [isValidToken, currentUser] = await validateToken();
 
 /**
  *
  * @description ContextProvider
  */
 export const AuthProvider: FC<{children: ReactNode}> = ({ children }) => {
-  const [userProfile, setUserProfile] = useState(currentUser);
-  const [isLogged, setIsLogged] = useState(isValidToken);
+  const navigate = useNavigate();
+  const [userProfile, setUserProfile] = useState({} as UserProfile);
+  const [isLogged, setIsLogged] = useState(false);
 
-  // 1. gets a valid JWT from server
   const signIn = (userInput: UserPayload, next: CallableFunction): void => {
     authService.fetchToken(userInput)
       .then(() => {
@@ -85,13 +73,29 @@ export const AuthProvider: FC<{children: ReactNode}> = ({ children }) => {
     }
   };
 
+  const onStartUp = () => {
+    if (isThereLocalToken()) {
+      authService.fetchUserProfile()
+        .then((user) => {
+          setUserProfile(user);
+          setIsLogged(true);
+          navigate('/');
+        })
+        .catch(() => {
+          authService.deleteLocalToken();
+        });
+    }
+  };
+
   const signOut = async () => {
     setIsLogged(false);
     setUserProfile({} as UserProfile);
     authService.deleteLocalToken();
   };
 
-  // 2. fetches a userProfile given a new JWT.
+  // 1.Checks for a valid local token
+  useEffect(onStartUp, []);
+
   useEffect(fetchNewUserProfile, [isLogged]);
 
   /**

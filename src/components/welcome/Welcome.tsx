@@ -14,6 +14,7 @@ export const Welcome: FC = () => {
     }
   }, [userProfile]);
 
+
   if (isLoading) {
     return <Spinner size="font-6" />;
   }
